@@ -1,8 +1,22 @@
-#include "common.hpp"
-#include "chunk.hpp"
+// std
+#include <cstdlib>
+#include <iostream>
+
+// User defined
+#include "src/includes/Run.hpp"
+#include "src/includes/Error.hpp"
 
 int main(int argc, const char* argv[]) {
-    Chunk chunk;
-    chunk.writeChunk(chunk, OP_RETURN);
-    return 0;
+    try {
+        auto runner = std::make_unique<Run>();
+        if (argc > 2) {
+            throw std::invalid_argument("Usage: cpplox [script]");
+        } else if (argc == 2) {
+            runner->ExecuteFile(argv[0]);
+        } else {
+            runner->ExecutePrompt();
+        }
+    } catch (const std::exception &e) {
+        std::cout << e.what() << std::endl;
+    }
 }

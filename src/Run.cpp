@@ -1,0 +1,32 @@
+#include "includes/Run.hpp"
+
+void Run::Execute(const std::string& source) {
+    auto scanner = std::make_unique<Scanner>(source);
+    std::vector<Tokens> tokens = scanner.ScanTokens();
+
+    for (auto &token: tokens) {
+        std::cout << token << std::endl;
+    }
+}
+
+void Run::ExecutePrompt() {
+    std::string line;
+    
+    std::cout << "> ";
+    while(std::getline(std::cin, line)) {
+        std::cout << "> ";
+        if (line == "")
+            { break; }
+        Execute(line);
+    }
+}
+
+void Run::ExecuteFile(const std::string& path) {
+    std::ifstream file(path, std::ios::binary);
+    if (!file) {
+        throw std::runtime_error("Error opening file");
+    }
+
+    std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    Execute(content);
+}
