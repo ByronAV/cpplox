@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -20,6 +21,4 @@ class Run {
     static void Execute(const std::string& source);
     static void ExecutePrompt();
     static void ExecuteFile(const std::string& path);
-
-
 };

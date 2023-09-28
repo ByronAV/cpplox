@@ -1,8 +1,10 @@
 #include "includes/Run.hpp"
+#include "includes/Error.hpp"
+#include "includes/Token.hpp"
 
 void Run::Execute(const std::string& source) {
     auto scanner = std::make_unique<Scanner>(source);
-    std::vector<Tokens> tokens = scanner.ScanTokens();
+    std::vector<Token> tokens = scanner.ScanTokens();
 
     for (auto &token: tokens) {
         std::cout << token << std::endl;
@@ -18,6 +20,7 @@ void Run::ExecutePrompt() {
         if (line == "")
             { break; }
         Execute(line);
+        Error::had_error = false;
     }
 }
 
@@ -29,4 +32,5 @@ void Run::ExecuteFile(const std::string& path) {
 
     std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
     Execute(content);
+    if (Error::had_error) { throw std::runtime_error("Error while parsing file"); }
 }

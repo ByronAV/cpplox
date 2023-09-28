@@ -1,4 +1,8 @@
 #pragma once
+
+#include <string>
+#include <iostream>
+
 class Error
 {
   public:
@@ -11,7 +15,5 @@ class Error
     inline static void SendError(unsigned int line, const std::string& message) {
         Report(line, "", message);
     }
-  private:
     inline static bool had_error;
-
 };

@@ -1,22 +1,32 @@
 cmake_minimum_required(VERSION 3.26)
+set(CMAKE_CXX_STANDARD 20)
+
+include(FetchContent)
 
 project(CPPLOX)
-
-set(CMAKE_CXX_STANDARD 20)
 
 # Set binary path
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
-file(GLOB sources "src/*.cpp")
-foreach(file ${sources})
-    set(SOURCES ${file}) 
-endforeach()
+set(SOURCES
+    src/Run.cpp
+    src/Error.cpp
+    src/Token.cpp
+)
 
 set(INCLUDE_DIRECTORIES
     src/include
 )
 
+# Fetch the latest version of `fmt` and include it
+FetchContent_Declare(fmt
+  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+  GIT_TAG master
+)
+FetchContent_MakeAvailable(fmt)
+
 add_executable(cpplox main.cpp ${SOURCES})
 
 target_include_directories(cpplox PRIVATE ${INCLUDE_DIRECTORIES})
+target_link_libraries(cpplox PRIVATE fmt::fmt)
