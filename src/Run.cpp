@@ -1,10 +1,11 @@
 #include "includes/Run.hpp"
 #include "includes/Error.hpp"
 #include "includes/Token.hpp"
+#include "includes/Scanner.hpp"
 
 void Run::Execute(const std::string& source) {
     auto scanner = std::make_unique<Scanner>(source);
-    std::vector<Token> tokens = scanner.ScanTokens();
+    auto& tokens = scanner->ScanTokens();
 
     for (auto &token: tokens) {
         std::cout << token << std::endl;

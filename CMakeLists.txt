@@ -13,6 +13,7 @@ set(SOURCES
     src/Run.cpp
     src/Error.cpp
     src/Token.cpp
+    src/Scanner.cpp
 )
 
 set(INCLUDE_DIRECTORIES
@@ -26,7 +27,15 @@ FetchContent_Declare(fmt
 )
 FetchContent_MakeAvailable(fmt)
 
+# Fetch the latest version of `robin_hood` and include it
+FetchContent_Declare(robin_hood
+  GIT_REPOSITORY https://github.com/martinus/robin-hood-hashing.git
+  GIT_TAG master
+)
+FetchContent_MakeAvailable(robin_hood)
+
 add_executable(cpplox main.cpp ${SOURCES})
 
+target_compile_options(cpplox PRIVATE -Wall -Wextra -Wpedantic -Werror)
 target_include_directories(cpplox PRIVATE ${INCLUDE_DIRECTORIES})
-target_link_libraries(cpplox PRIVATE fmt::fmt)
+target_link_libraries(cpplox PRIVATE fmt::fmt robin_hood::robin_hood)
