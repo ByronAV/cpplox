@@ -55,7 +55,7 @@ class Token {
     const void* literal;
     const unsigned int line;
 
-    Token(const TokenType& in_token, const std::string& in_lexeme, const void* in_literal, unsigned int in_line);
+    explicit Token(const TokenType& in_token, const std::string& in_lexeme, const void* in_literal, unsigned int in_line);
     ~Token() = default;
 
     inline std::string ToString()
