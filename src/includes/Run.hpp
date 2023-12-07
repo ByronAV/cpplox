@@ -1,24 +1,23 @@
 #pragma once
 
-#include <string>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <string>
 
 class Run {
+public:
+  Run() = default;
+  ~Run() = default;
 
-  public:
-    Run() = default;
-    ~Run() = default;
+  // No copy
+  Run(const Run &) = delete;
+  Run &operator=(const Run &) = delete;
 
-    // No copy
-    Run(const Run&) = delete;
-    Run& operator=(const Run&) = delete;
+  // No move
+  Run(Run &&) = delete;
+  Run &operator=(Run &&) = delete;
 
-    // No move
-    Run(Run&&) = delete;
-    Run& operator=(Run&&) = delete;
-
-    static void Execute(const std::string& source);
-    static void ExecutePrompt();
-    static void ExecuteFile(const std::string& path);
+  static void Execute(const std::string &source);
+  static void ExecutePrompt();
+  static void ExecuteFile(const std::string &path);
 };
