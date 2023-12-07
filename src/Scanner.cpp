@@ -3,15 +3,28 @@
 
 Scanner::Scanner(const std::string& in_source) : source(in_source) {}
 
-void Scanner::AddToken(const TokenType& type, void* literal)
+void Scanner::AddToken(const TokenType& type, const void* literal)
 {
-    std::string text = source.substr(start, current - start); // TODO: Might need to fix the second parameter here
-    tokens.push_back(std::make_unique<Token>(type, text, literal, line));
+    tokens.push_back(std::make_unique<Token>(type, "RESERVED", literal, line));
+}
+
+// Overloading for Strings
+void Scanner::AddToken(const TokenType& type, std::unique_ptr<const std::string> literal)
+{
+    std::string text = source.substr(start, current - start);
+    tokens.push_back(std::make_unique<Token>(type, std::move(text), std::move(literal), line));
+}
+
+// Overloading for Numbers
+void Scanner::AddToken(const TokenType& type, std::unique_ptr<const double> literal)
+{
+    const std::string number = source.substr(start, current - start);
+    tokens.push_back(std::make_unique<Token>(type, std::move(number), std::move(literal), line));
 }
 
 void Scanner::AddToken(const TokenType& type)
 {
-    AddToken(type, nullptr);
+    AddToken(type, static_cast<void*>(nullptr));
 }
 
 void Scanner::String()
@@ -31,8 +44,8 @@ void Scanner::String()
     Advance();
 
     // Trim the surrounding quotes
-    std::string value = source.substr(start + 1, current - start - 1); // TODO: Might need to fix the second parameter here
-    AddToken(TokenType::STRING, std::move(&value)); // TODO: If value goes out of scope, do we have a dangling pointer or is the ownership transfered ?
+    auto value = std::make_unique<const std::string>(source.substr(start + 1, current - start - 2)); // TODO: Might need to fix the second parameter here
+    AddToken(TokenType::STRING, std::move(value));
 }
 
 void Scanner::Number()
@@ -47,8 +60,8 @@ void Scanner::Number()
 
         while (IsDigit(Peek())) { Advance(); }
     }
-    auto number = std::stod(source.substr(start, current - start));
-    AddToken(TokenType::NUMBER, std::move(&number));
+    auto number = std::make_unique<const double>(std::stod(source.substr(start, current - start)));
+    AddToken(TokenType::NUMBER, std::move(number));
 }
 
 void Scanner::Identifier()
@@ -132,7 +145,10 @@ std::vector<std::unique_ptr<Token>> const& Scanner::ScanTokens()
         ScanToken();
     }
 
-    tokens.push_back(std::make_unique<Token>(TokenType::TEOF, "", nullptr, line));
+    AddToken(TokenType::TEOF);
+    // Push scanner back at the beginning of line
+    current = 0;
+    start = 0;
     return tokens;
 }
 

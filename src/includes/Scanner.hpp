@@ -57,7 +57,9 @@ private:
 
     void ScanToken();
     void AddToken(const TokenType& type);
-    void AddToken(const TokenType& type, void* literal);
+    void AddToken(const TokenType& type, const void* literal);
+    void AddToken(const TokenType& type, std::unique_ptr<const std::string> literal);
+    void AddToken(const TokenType& type, std::unique_ptr<const double> literal);
     void String();
     void Number();
     void Identifier();

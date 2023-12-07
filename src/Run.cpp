@@ -8,7 +8,7 @@ void Run::Execute(const std::string& source) {
     auto& tokens = scanner->ScanTokens();
 
     for (auto &token: tokens) {
-        std::cout << token << std::endl;
+        std::cout << *token << std::endl;
     }
 }
 
@@ -17,11 +17,11 @@ void Run::ExecutePrompt() {
     
     std::cout << "> ";
     while(std::getline(std::cin, line)) {
-        std::cout << "> ";
         if (line == "")
             { break; }
         Execute(line);
         Error::had_error = false;
+        std::cout << "> ";
     }
 }
 

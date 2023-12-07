@@ -26,12 +26,12 @@ function build() {
             cmake -DCMAKE_BUILD_TYPE=Release ..
         fi
     else
-        echo "This build needs CMake >v3.6"
+        echo "ERROR: This build needs CMake >v3.6"
         exit 1
     fi
 
     # Run the makefile
-    make
+    make -j $(nproc)
 }
 
 function clean() {

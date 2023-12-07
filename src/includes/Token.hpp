@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <variant>
 #include <fmt/core.h>
 
 enum class TokenType {
@@ -38,9 +39,9 @@ namespace fmt {
                 ",", ".", "-", "+", ";", "/", "*",
                 "!", "!=", "=", "==",
                 ">", ">=", "<", "<=",
-                "identifier", "string", "int",
-                "&&", "class", "else", "false", "fun", "for", "if", "nil", "||",
-                "print", "return", "super", "this", "true", "var", "while"
+                "IDENTIFIER", "STRING", "NUMBER",
+                "&&", "CLASS", "ELSE", "FALSE", "FUN", "FOR", "IF", "NIL", "||",
+                "PRINT", "RETURN", "SUPER", "THIS", "TRUE", "VAR", "WHILE", "TEOF"
             };
       return format_to(ctx.out(), "{}", token_names[static_cast<int>(t)]); // Assuming TokenType can be formatted using "{}"
     }
@@ -52,20 +53,39 @@ class Token {
   public:
     const TokenType type;
     const std::string lexeme;
-    const void* literal;
+    std::variant<const void*, std::unique_ptr<const double>, std::unique_ptr<const std::string>> literal;
+    //const void* literal;
     const unsigned int line;
 
-    explicit Token(const TokenType& in_token, const std::string& in_lexeme, const void* in_literal, unsigned int in_line);
+    template <typename T>
+    Token(const TokenType& in_token, const std::string& in_lexeme, T in_literal, unsigned int in_line): 
+          type(in_token),
+          lexeme(in_lexeme),
+          literal(std::move(in_literal)),
+          line(in_line) {}
+    template <typename T>
+    Token(const TokenType& in_token, std::string&& in_lexeme, T in_literal, unsigned int in_line): 
+          type(in_token),
+          lexeme(std::move(in_lexeme)),
+          literal(std::move(in_literal)),
+          line(in_line) {}
     ~Token() = default;
 
-    inline std::string ToString()
+    inline std::string ToString() const
     {
-        return fmt::format("{} {} {}", type, lexeme, literal);
+      if (type == TokenType::NUMBER)
+        // std::get_if returns a pointer if the value stored is of type otherwise null
+        // because we store pointers in the variant, to get the underlying we need double reference
+        { return fmt::format("{} {} {}", type, lexeme, *std::get<std::unique_ptr<const double>>(literal)); }
+      else if (type == TokenType::STRING)
+        { return fmt::format("{} {} {}", type, lexeme, *std::get<std::unique_ptr<const std::string>>(literal));  }
+      else
+        { return fmt::format("{} {}", type, lexeme); }
     }
 
     friend std::ostream& operator<<(std::ostream& stream, const Token& data)
     {
-        stream << fmt::format("{} {} {}", data.type, data.lexeme, data.literal);
+        stream << data.ToString();
         return stream;
     }
 

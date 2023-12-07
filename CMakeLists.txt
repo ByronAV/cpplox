@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.26)
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_COMPILER "/usr/bin/g++")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG_FLAG -Wall -g -O0")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 include(FetchContent)
 
@@ -16,9 +19,7 @@ set(SOURCES
     src/Scanner.cpp
 )
 
-set(INCLUDE_DIRECTORIES
-    src/include
-)
+set(INCLUDE_DIRECTORIES src/includes)
 
 # Fetch the latest version of `fmt` and include it
 FetchContent_Declare(fmt
@@ -34,7 +35,7 @@ FetchContent_Declare(robin_hood
 )
 FetchContent_MakeAvailable(robin_hood)
 
-add_executable(cpplox main.cpp ${SOURCES})
+add_executable(cpplox main.cpp ${SOURCES} ${INCLUDE_DIRECTORIES})
 
 target_compile_options(cpplox PRIVATE -Wall -Wextra -Wpedantic -Werror)
 target_include_directories(cpplox PRIVATE ${INCLUDE_DIRECTORIES})

@@ -1,6 +1,7 @@
 // std
 #include <cstdlib>
 #include <iostream>
+#include <memory>
 
 // User defined
 #include "src/includes/Run.hpp"
