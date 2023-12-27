@@ -6,11 +6,7 @@
 
 void Run::Execute(const std::string &source) {
   auto scanner = std::make_unique<Scanner>(source);
-  auto &tokens = scanner->ScanTokens();
-
-  for (auto &token : tokens) {
-    std::cout << *token << std::endl;
-  }
+  scanner->ScanTokens();
 }
 
 void Run::ExecutePrompt() {

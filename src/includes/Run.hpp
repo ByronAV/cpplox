@@ -5,7 +5,7 @@
 #include <string>
 
 class Run {
-public:
+ public:
   Run() = default;
   ~Run() = default;
 

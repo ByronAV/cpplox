@@ -4,7 +4,7 @@
 #include <string>
 
 class Error {
-public:
+ public:
   Error() = default;
   ~Error() = default;
   inline static void Report(unsigned int line, const std::string &where,

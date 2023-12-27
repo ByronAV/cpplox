@@ -3,21 +3,26 @@
 #include <robin_hood.h>
 
 #include <string>
+#include <variant>
 #include <vector>
 
 #include "Error.hpp"
 #include "Token.hpp"
 
+using TokenVoid = Token<const void *>;
+using TokenString = Token<std::unique_ptr<const std::string>>;
+using TokenDouble = Token<std::unique_ptr<const double>>;
+
 class Scanner {
-public:
+ public:
   explicit Scanner(const std::string &in_source);
   ~Scanner() = default;
-  std::vector<std::unique_ptr<Token>> const &ScanTokens();
+  void ScanTokens();
   inline bool IsAtEnd() {
     return static_cast<size_t>(current) >= source.size();
   }
 
-private:
+ private:
   inline char Advance() { return source.at(current++); }
   inline char Peek() {
     if (IsAtEnd()) {
@@ -58,7 +63,7 @@ private:
   void Number();
   void Identifier();
 
-private:
+ private:
   inline static int start = 0;
   inline static int current = 0;
   inline static int line = 1;
@@ -73,5 +78,4 @@ private:
                   {"this", TokenType::THIS},     {"true", TokenType::TRUE},
                   {"var", TokenType::VAR},       {"while", TokenType::WHILE}};
   std::string source;
-  std::vector<std::unique_ptr<Token>> tokens;
 };

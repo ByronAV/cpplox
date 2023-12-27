@@ -4,23 +4,24 @@
 Scanner::Scanner(const std::string &in_source) : source(in_source) {}
 
 void Scanner::AddToken(const TokenType &type, const void *literal) {
-  tokens.push_back(std::make_unique<Token>(type, "RESERVED", literal, line));
+  TokenVoid::GetTokens()->push_back(
+      std::make_unique<TokenVoid>(type, "RESERVED", literal, line));
 }
 
 // Overloading for Strings
 void Scanner::AddToken(const TokenType &type,
                        std::unique_ptr<const std::string> literal) {
   std::string text = source.substr(start, current - start);
-  tokens.push_back(
-      std::make_unique<Token>(type, std::move(text), std::move(literal), line));
+  TokenString::GetTokens()->push_back(std::make_unique<TokenString>(
+      type, std::move(text), std::move(literal), line));
 }
 
-// Overloading for Numbers
+// // Overloading for Numbers
 void Scanner::AddToken(const TokenType &type,
                        std::unique_ptr<const double> literal) {
-  const std::string number = source.substr(start, current - start);
-  tokens.push_back(std::make_unique<Token>(type, std::move(number),
-                                           std::move(literal), line));
+  std::string text = source.substr(start, current - start);
+  TokenDouble::GetTokens()->push_back(std::make_unique<TokenDouble>(
+      type, std::move(text), std::move(literal), line));
 }
 
 void Scanner::AddToken(const TokenType &type) {
@@ -44,9 +45,10 @@ void Scanner::String() {
   Advance();
 
   // Trim the surrounding quotes
-  auto value = std::make_unique<const std::string>(source.substr(
-      start + 1, current - start -
-                     2)); // TODO: Might need to fix the second parameter here
+  auto value = std::make_unique<std::string>(source.substr(
+      start + 1,
+      current - start -
+          2));  // TODO: Might need to fix the second parameter here
   AddToken(TokenType::STRING, std::move(value));
 }
 
@@ -64,7 +66,7 @@ void Scanner::Number() {
       Advance();
     }
   }
-  auto number = std::make_unique<const double>(
+  auto number = std::make_unique<double>(
       std::stod(source.substr(start, current - start)));
   AddToken(TokenType::NUMBER, std::move(number));
 }
@@ -91,84 +93,84 @@ void Scanner::ScanToken() {
   char c = Advance();
 
   switch (c) {
-  case '(':
-    AddToken(TokenType::LEFT_PAREN);
-    break;
-  case ')':
-    AddToken(TokenType::RIGHT_PAREN);
-    break;
-  case '{':
-    AddToken(TokenType::LEFT_BRACE);
-    break;
-  case '}':
-    AddToken(TokenType::RIGHT_BRACE);
-    break;
-  case ',':
-    AddToken(TokenType::COMMA);
-    break;
-  case '.':
-    AddToken(TokenType::DOT);
-    break;
-  case '-':
-    AddToken(TokenType::MINUS);
-    break;
-  case '+':
-    AddToken(TokenType::PLUS);
-    break;
-  case ';':
-    AddToken(TokenType::SEMICOLON);
-    break;
-  case '*':
-    AddToken(TokenType::STAR);
-    break;
-  case '!':
-    AddToken(Match('=') ? TokenType::BANG_EQUAL : TokenType::BANG);
-    break;
-  case '=':
-    AddToken(Match('=') ? TokenType::EQUAL_EQUAL : TokenType::EQUAL);
-    break;
-  case '<':
-    AddToken(Match('=') ? TokenType::LESS_EQUAL : TokenType::LESS);
-    break;
-  case '>':
-    AddToken(Match('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER);
-    break;
-  case '/':
-    if (Match('/')) {
-      // A comment goes untill the end of the line
-      while (Peek() != '\n' && !IsAtEnd()) {
-        Advance();
+    case '(':
+      AddToken(TokenType::LEFT_PAREN);
+      break;
+    case ')':
+      AddToken(TokenType::RIGHT_PAREN);
+      break;
+    case '{':
+      AddToken(TokenType::LEFT_BRACE);
+      break;
+    case '}':
+      AddToken(TokenType::RIGHT_BRACE);
+      break;
+    case ',':
+      AddToken(TokenType::COMMA);
+      break;
+    case '.':
+      AddToken(TokenType::DOT);
+      break;
+    case '-':
+      AddToken(TokenType::MINUS);
+      break;
+    case '+':
+      AddToken(TokenType::PLUS);
+      break;
+    case ';':
+      AddToken(TokenType::SEMICOLON);
+      break;
+    case '*':
+      AddToken(TokenType::STAR);
+      break;
+    case '!':
+      AddToken(Match('=') ? TokenType::BANG_EQUAL : TokenType::BANG);
+      break;
+    case '=':
+      AddToken(Match('=') ? TokenType::EQUAL_EQUAL : TokenType::EQUAL);
+      break;
+    case '<':
+      AddToken(Match('=') ? TokenType::LESS_EQUAL : TokenType::LESS);
+      break;
+    case '>':
+      AddToken(Match('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER);
+      break;
+    case '/':
+      if (Match('/')) {
+        // A comment goes untill the end of the line
+        while (Peek() != '\n' && !IsAtEnd()) {
+          Advance();
+        }
+      } else {
+        AddToken(TokenType::SLASH);
       }
-    } else {
-      AddToken(TokenType::SLASH);
-    }
-    break;
-  case ' ':
-    [[fallthrough]];
-  case '\r':
-    [[fallthrough]];
-  case '\t':
-    // Ignore whitespace
-    break;
-  case '\n':
-    line++;
-    break;
-  case '"':
-    String();
-    break;
-  default:
-    if (IsDigit(c)) {
-      Number();
-    } else if (IsAlpha(c)) {
-      Identifier();
-    } else {
-      Error::SendError(line, "Unexpected character.");
-    }
-    break;
+      break;
+    case ' ':
+      [[fallthrough]];
+    case '\r':
+      [[fallthrough]];
+    case '\t':
+      // Ignore whitespace
+      break;
+    case '\n':
+      line++;
+      break;
+    case '"':
+      String();
+      break;
+    default:
+      if (IsDigit(c)) {
+        Number();
+      } else if (IsAlpha(c)) {
+        Identifier();
+      } else {
+        Error::SendError(line, "Unexpected character.");
+      }
+      break;
   }
 }
 
-std::vector<std::unique_ptr<Token>> const &Scanner::ScanTokens() {
+void Scanner::ScanTokens() {
   while (!IsAtEnd()) {
     start = current;
     ScanToken();
@@ -178,5 +180,8 @@ std::vector<std::unique_ptr<Token>> const &Scanner::ScanTokens() {
   // Push scanner back at the beginning of line
   current = 0;
   start = 0;
-  return tokens;
+
+  // There's probably a better way to clear it, but we don't
+  // care about the type at the point of clearing.
+  TokenVoid::ClearTokens();
 }
