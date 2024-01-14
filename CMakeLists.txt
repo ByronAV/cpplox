@@ -17,6 +17,7 @@ set(SOURCES
     src/Error.cpp
     src/Token.cpp
     src/Scanner.cpp
+    src/Expr.cpp
 )
 
 set(INCLUDE_DIRECTORIES src/includes)

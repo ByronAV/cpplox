@@ -106,6 +106,11 @@ class Token {
         lexeme(std::move(input.lexeme)),
         literal(std::move(input.literal)),
         line(std::move(input.line)) {}
+  Token(const Token& input)
+      : type(std::move(input.type)),
+        lexeme(std::move(input.lexeme)),
+        literal(std::move(input.literal)),
+        line(std::move(input.line)) {}
   Token() = default;
   ~Token() = default;
 
