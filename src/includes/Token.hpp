@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TOKEN_HPP
+#define TOKEN_HPP
 
 #include <fmt/core.h>
 
@@ -136,3 +137,5 @@ class Token {
 
 template <typename T>
 std::vector<std::unique_ptr<Token<T>>> Token<T>::tokens;
+
+#endif

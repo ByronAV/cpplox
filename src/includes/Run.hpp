@@ -1,7 +1,6 @@
-#pragma once
+#ifndef RUN_HPP
+#define RUN_HPP
 
-#include <fstream>
-#include <iostream>
 #include <string>
 
 class Run {
@@ -21,3 +20,5 @@ class Run {
   static void ExecutePrompt();
   static void ExecuteFile(const std::string &path);
 };
+
+#endif

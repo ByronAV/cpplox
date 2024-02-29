@@ -1,3 +1,5 @@
+#include <fstream>
+
 #include "includes/Run.hpp"
 
 #include "includes/Error.hpp"

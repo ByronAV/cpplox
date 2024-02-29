@@ -1,10 +1,9 @@
 // std
 #include <cstdlib>
-#include <iostream>
 #include <memory>
+#include <iostream>
 
 // User defined
-#include "src/includes/Error.hpp"
 #include "src/includes/Run.hpp"
 
 int main(int argc, const char *argv[]) {
@@ -18,6 +17,6 @@ int main(int argc, const char *argv[]) {
       runner->ExecutePrompt();
     }
   } catch (const std::exception &e) {
-    std::cout << e.what() << std::endl;
+    std::cerr << e.what() << std::endl;
   }
 }

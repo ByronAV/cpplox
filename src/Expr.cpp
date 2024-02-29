@@ -2,83 +2,124 @@
 
 // ------------- ASSIGN CLASS -------------
 template<typename T, typename U>
-Assign<T, U>::Assign(const Token<U>& name, const Expr<T, U>& value)
-: _value(std::make_unique<const Expr<T, U>>(value)),
-  _name(std::make_unique<const Token<U>>(name)) {}
+Assign<T, U>::Assign(Token<U>& name, Expr<T, U>& value) noexcept
+: _value(value.Clone()),
+  _name(std::make_unique<Token<U>>(name)) {}
 
+
+template<typename T, typename U>
+Assign<T, U>::Assign(Assign&& other) noexcept : _value(std::move(other._value)), _name(std::move(other._name)) {}
 
 // ------------- BINARY CLASS -------------
 template<typename T, typename U>
-Binary<T, U>::Binary(const Expr<T, U>& left, const Token<U>& oper, const Expr<T, U>& right)
- : _left(std::make_unique<const Expr<T, U>>(left)),
-   _operator(std::make_unique<const Token<U>>(oper)),
-   _right(std::make_unique<const Expr<T, U>>(right)) {}
+Binary<T, U>::Binary(Expr<T, U>& left, Token<U>& oper, Expr<T, U>& right) noexcept
+ : _left(left.Clone()),
+   _operator(std::make_unique<Token<U>>(oper)),
+   _right(right.Clone()) {}
+
+template<typename T, typename U>
+Binary<T, U>::Binary(Binary&& other) noexcept : _left(std::move(other._left)), _operator(std::move(other._operator)), _right(std::move(other._right)) {}
 
 
 // ------------- CALL CLASS -------------
 template<typename T, typename U>
-Call<T, U>::Call(const Expr<T, U>& callee, const Token<U>& paren, ConstRefVecExpr<T, U>& arguments)
-  : _callee(std::make_unique<const Expr<T, U>>(callee)),
-    _paren(std::make_unique<const Token<U>>(paren)),
-    _arguments(std::make_unique<ConstRefVecExpr<T, U>>(arguments)) {}
+Call<T, U>::Call(Expr<T, U>& callee, Token<U>& paren, PtrVecExpr<T, U>& arguments) noexcept
+  : _callee(callee.Clone()),
+    _paren(std::make_unique<Token<U>>(paren)) {
+      _arguments = std::make_unique<PtrVecExpr<T, U>>();
+      for(auto&& arg: arguments) {
+        _arguments->push_back(arg->Clone());
+      }
+    }
+
+template<typename T, typename U>
+Call<T, U>::Call(Call&& other) noexcept : _callee(std::move(other._callee)), _paren(std::move(other._paren)), _arguments(std::move(other._arguments)) {}
 
 
 // ------------- GET CLASS -------------
 template<typename T, typename U>
-Get<T, U>::Get(const Expr<T, U>& object, const Token<U>& name)
-  : _object(std::make_unique<const Expr<T, U>>(object)),
-    _name(std::make_unique<const Token<U>>(name)) {}
+Get<T, U>::Get(Expr<T, U>& object, Token<U>& name) noexcept
+  : _object(object.Clone()),
+    _name(std::make_unique<Token<U>>(name)) {}
+
+template<typename T, typename U>
+Get<T, U>::Get(Get&& other) noexcept : _object(std::move(other._object)), _name(std::move(other._name)) {}
 
 
 // ------------- GROUPING CLASS -------------
 template<typename T, typename U>
-Grouping<T, U>::Grouping(const Expr<T, U>& expression)
-  : _expression(std::make_unique<const Expr<T, U>>(expression)) {}
+Grouping<T, U>::Grouping(Expr<T, U>& expression) noexcept
+  : _expression(expression.Clone()) {}
+
+template<typename T, typename U>
+Grouping<T, U>::Grouping(Grouping&& other) noexcept : _expression(std::move(other._expression)) {}
 
 
 // ------------- LITERAL CLASS -------------
 template<typename T, typename U>
-Literal<T, U>::Literal(const void* object)
-  : _object(std::make_unique<const void>(object)) {}
+Literal<T, U>::Literal(T& value, size_t size) noexcept
+  : _value(std::make_unique<T>(value)), _size(size) {}
+
+template<typename T, typename U>
+Literal<T, U>::Literal(Literal&& other) noexcept : _value(std::move(other._value)), _size(std::move(other._size)) {}
 
 
 // ------------- LOGICAL CLASS -------------
 template<typename T, typename U>
-Logical<T, U>::Logical(const Expr<T, U>& left, const Token<U>& oper, const Expr<T, U>& right)
- : _left(std::make_unique<const Expr<T, U>>(left)),
-   _operator(std::make_unique<const Token<U>>(oper)),
-   _right(std::make_unique<const Expr<T, U>>(right)) {}
+Logical<T, U>::Logical(Expr<T, U>& left, Token<U>& oper, Expr<T, U>& right) noexcept
+ : _left(std::move(left)),
+   _operator(std::move(oper)),
+   _right(std::move(right)) {}
 
+template<typename T, typename U>
+Logical<T, U>::Logical(Logical&& other) noexcept : _left(other._left), _operator(std::move(other._operator)), _right(std::move(other._right)) {}
   
 // ------------- SET CLASS -------------
 template<typename T, typename U>
-Set<T, U>::Set(const Expr<T, U>& object, const Token<U>& name, const Expr<T, U>& value)
-  : _object(std::make_unique<const Expr<T, U>>(object)),
-    _name(std::make_unique<const Token<U>>(name)),
-    _value(std::make_unique<const Expr<T, U>>(value)) {}
+Set<T, U>::Set(Expr<T, U>& object, Token<U>& name, Expr<T, U>& value) noexcept
+  : _object(std::move(object)),
+    _name(std::move(name)),
+    _value(std::move(value)) {}
+
+template<typename T, typename U>
+Set<T, U>::Set(Set&& other) noexcept : _object(std::move(other._object)), _name(std::move(other._name)), _value(std::move(other._value)) {}
 
 
 // ------------- SUPER CLASS -------------
 template<typename T, typename U>
-Super<T, U>::Super(const Token<U>& keyword, const Token<U>& method)
-  : _keyword(std::make_unique<const Token<U>>(keyword)),
-    _method(std::make_unique<const Expr<T, U>>(method)) {}
+Super<T, U>::Super(Token<U>& keyword, Token<U>& method) noexcept
+  : _keyword(std::move(keyword)),
+    _method(std::move(method)) {}
+
+template<typename T, typename U>
+Super<T, U>::Super(Super&& other) noexcept : _keyword(std::move(other._keyword)), _method(std::move(other._method)) {}
 
 
 // ------------- THIS CLASS -------------
 template<typename T, typename U>
-This<T, U>::This(const Token<U>& keyword)
-  : _keyword(std::make_unique<const Token<U>>(keyword)) {}
+This<T, U>::This(Token<U>& keyword) noexcept
+  : _keyword(std::move(keyword)) {}
+
+template<typename T, typename U>
+This<T, U>::This(This&& other) noexcept : _keyword(std::move(other._keyword)) {}
+
 
 
 // ------------- UNARY CLASS -------------
 template<typename T, typename U>
-Unary<T, U>::Unary(const Token<U>& oper, const Expr<T, U>& right)
+Unary<T, U>::Unary(Token<U>& oper, Expr<T, U>& right) noexcept
   : _operator(std::make_unique<Token<U>>(oper)),
-    _right(std::make_unique<const Token<U>>(right)) {}
+    _right(right.Clone()) {}
+
+template<typename T, typename U>
+Unary<T, U>::Unary(Unary&& other) noexcept : _operator(std::move(other._operator)), _right(std::move(other._right)) {}
 
 
 // ------------- VARIABLE CLASS -------------
 template<typename T, typename U>
-Variable<T, U>::Variable(const Token<U>& name)
-  : _name(std::make_unique<const Token<U>>(name)) {}
+Variable<T, U>::Variable(Token<U>& name) noexcept
+  : _name(std::move(name)) {}
+
+
+template<typename T, typename U>
+Variable<T, U>::Variable(Variable&& other) noexcept : _name(std::move(other._name)) {}

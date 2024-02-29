@@ -1,12 +1,10 @@
-#pragma once
+#ifndef SCANNER_HPP
+#define SCANNER_HPP
 
 #include <robin_hood.h>
 
 #include <string>
-#include <variant>
-#include <vector>
 
-#include "Error.hpp"
 #include "Token.hpp"
 
 using TokenVoid = Token<const void *>;
@@ -79,3 +77,5 @@ class Scanner {
                   {"var", TokenType::VAR},       {"while", TokenType::WHILE}};
   std::string source;
 };
+
+#endif

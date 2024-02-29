@@ -14,7 +14,6 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 set(SOURCES
     src/Run.cpp
-    src/Error.cpp
     src/Token.cpp
     src/Scanner.cpp
     src/Expr.cpp
