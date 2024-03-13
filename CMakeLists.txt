@@ -40,3 +40,17 @@ add_executable(cpplox main.cpp ${SOURCES} ${INCLUDE_DIRECTORIES})
 target_compile_options(cpplox PRIVATE -Wall -Wextra -Wpedantic -Werror)
 target_include_directories(cpplox PRIVATE ${INCLUDE_DIRECTORIES})
 target_link_libraries(cpplox PRIVATE fmt::fmt robin_hood::robin_hood)
+
+## Testing
+FetchContent_Declare(
+  googletest
+  # Specify the commit you depend on and update it regularly.
+  URL https://github.com/google/googletest/archive/5376968f6948923e2411081fd9372e71a59d8e77.zip
+)
+FetchContent_MakeAvailable(googletest)
+
+add_executable(tests tests/unit_tests/test_token.cpp ${SOURCES} ${INCLUDE_DIRECTORIES})
+target_include_directories(tests PRIVATE ${INCLUDE_DIRECTORIES})
+target_link_libraries(tests PRIVATE fmt::fmt robin_hood::robin_hood gtest_main)
+enable_testing()
+add_test(NAME UnitTests COMMAND tests)

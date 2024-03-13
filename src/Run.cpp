@@ -1,6 +1,6 @@
-#include <fstream>
-
 #include "includes/Run.hpp"
+
+#include <fstream>
 
 #include "includes/Error.hpp"
 #include "includes/Scanner.hpp"

@@ -1,5 +1,6 @@
 
 #include "includes/Scanner.hpp"
+
 #include "includes/Error.hpp"
 
 Scanner::Scanner(const std::string &in_source) : source(in_source) {}

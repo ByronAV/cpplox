@@ -4,37 +4,37 @@
 #include "Token.hpp"
 
 // Forward Declarations
-template<typename T, typename U>
+template <typename T, typename U>
 class Assign;
-template<typename T, typename U>
+template <typename T, typename U>
 class Binary;
-template<typename T, typename U>
+template <typename T, typename U>
 class Call;
-template<typename T, typename U>
+template <typename T, typename U>
 class Get;
-template<typename T, typename U>
+template <typename T, typename U>
 class Grouping;
-template<typename T, typename U>
+template <typename T, typename U>
 class Literal;
-template<typename T, typename U>
+template <typename T, typename U>
 class Logical;
-template<typename T, typename U>
+template <typename T, typename U>
 class Set;
-template<typename T, typename U>
+template <typename T, typename U>
 class Super;
-template<typename T, typename U>
+template <typename T, typename U>
 class This;
-template<typename T, typename U>
+template <typename T, typename U>
 class Unary;
-template<typename T, typename U>
+template <typename T, typename U>
 class Variable;
 
 // ------------- EXPR CLASS -------------
-template<typename T, typename U>
+template <typename T, typename U>
 class Expr {
-public:
+ public:
   class Visitor {
-  public:
+   public:
     virtual T VisitAssignExpr(const Assign<T, U>& expr) const = 0;
     virtual T VisitBinaryExpr(const Binary<T, U>& expr) const = 0;
     virtual T VisitCallExpr(const Call<T, U>& expr) const = 0;
@@ -54,18 +54,18 @@ public:
   virtual T Accept(const Visitor& visitor) const = 0;
 };
 
-template<typename T, typename U>
+template <typename T, typename U>
 using PtrVecExpr = std::vector<std::unique_ptr<Expr<T, U>>>;
 
-
 // ------------- ASSIGN CLASS -------------
-template<typename T, typename U>
-class Assign: virtual public Expr<T, U> {
-public:
+template <typename T, typename U>
+class Assign : virtual public Expr<T, U> {
+ public:
   Assign(Token<U>& name, Expr<T, U>& value) noexcept;
   Assign(Assign&& other) noexcept;
 
-  [[gnu::always_inline]] T Accept(const typename Expr<T, U>::Visitor& visitor) const override {
+  [[gnu::always_inline]] T Accept(
+      const typename Expr<T, U>::Visitor& visitor) const override {
     return visitor.VisitAssignExpr(*this);
   }
 
@@ -73,27 +73,26 @@ public:
     return std::make_unique<Assign<T, U>>(*_value, *_name);
   }
 
-  [[gnu::always_inline]] const Token<U>* GetName() const {
-    return _name.get();
-  }
+  [[gnu::always_inline]] const Token<U>* GetName() const { return _name.get(); }
 
   [[gnu::always_inline]] const Expr<T, U>* GetValue() const {
     return _value.get();
   }
 
-private:
+ private:
   std::unique_ptr<Expr<T, U>> _value;
   std::unique_ptr<Token<U>> _name;
 };
 
 // ------------- BINARY CLASS -------------
-template<typename T, typename U>
+template <typename T, typename U>
 class Binary : virtual public Expr<T, U> {
-public:
+ public:
   Binary(Expr<T, U>& left, Token<U>& oper, Expr<T, U>& right) noexcept;
   Binary(Binary&& other) noexcept;
 
-  [[gnu::always_inline]] T Accept(const typename Expr<T, U>::Visitor& visitor) const override {
+  [[gnu::always_inline]] T Accept(
+      const typename Expr<T, U>::Visitor& visitor) const override {
     return visitor.VisitBinaryExpr(*this);
   }
 
@@ -113,20 +112,22 @@ public:
     return _right.get();
   }
 
-private:
+ private:
   std::unique_ptr<Expr<T, U>> _left;
   std::unique_ptr<Token<U>> _operator;
   std::unique_ptr<Expr<T, U>> _right;
 };
 
 // ------------- CALL CLASS -------------
-template<typename T, typename U>
-class Call: public Expr<T, U> {
-public:
-  Call(Expr<T, U>& callee, Token<U>& paren, PtrVecExpr<T, U>& arguments) noexcept;
+template <typename T, typename U>
+class Call : public Expr<T, U> {
+ public:
+  Call(Expr<T, U>& callee, Token<U>& paren,
+       PtrVecExpr<T, U>& arguments) noexcept;
   Call(Call&& other) noexcept;
 
-  [[gnu::always_inline]] T Accept(const typename Expr<T, U>::Visitor& visitor) const override {
+  [[gnu::always_inline]] T Accept(
+      const typename Expr<T, U>::Visitor& visitor) const override {
     return visitor.VisitCallExpr(*this);
   }
 
@@ -146,20 +147,21 @@ public:
     return _arguments.get();
   }
 
-private:
+ private:
   std::unique_ptr<Expr<T, U>> _callee;
   std::unique_ptr<Token<U>> _paren;
   std::unique_ptr<PtrVecExpr<T, U>> _arguments;
 };
 
 // ------------- GET CLASS -------------
-template<typename T, typename U>
-class Get: public Expr<T, U> {
-public:
+template <typename T, typename U>
+class Get : public Expr<T, U> {
+ public:
   Get(Expr<T, U>& object, Token<U>& name) noexcept;
   Get(Get&& other) noexcept;
 
-  [[gnu::always_inline]] T Accept(const typename Expr<T, U>::Visitor& visitor) const override {
+  [[gnu::always_inline]] T Accept(
+      const typename Expr<T, U>::Visitor& visitor) const override {
     return visitor.VisitGetExpr(*this);
   }
 
@@ -171,23 +173,22 @@ public:
     return _object.get();
   }
 
-  [[gnu::always_inline]] const Token<U>* GetName() const {
-    return _name.get();
-  }  
+  [[gnu::always_inline]] const Token<U>* GetName() const { return _name.get(); }
 
-private:
+ private:
   std::unique_ptr<Expr<T, U>> _object;
   std::unique_ptr<Token<U>> _name;
 };
 
 // ------------- GROUPING CLASS -------------
-template<typename T, typename U>
-class Grouping: public Expr<T, U> {
-public:
+template <typename T, typename U>
+class Grouping : public Expr<T, U> {
+ public:
   Grouping(Expr<T, U>& expression) noexcept;
   Grouping(Grouping&& other) noexcept;
 
-  [[gnu::always_inline]] T Accept(const typename Expr<T, U>::Visitor& visitor) const override {
+  [[gnu::always_inline]] T Accept(
+      const typename Expr<T, U>::Visitor& visitor) const override {
     return visitor.VisitGroupingExpr(*this);
   }
 
@@ -199,18 +200,19 @@ public:
     return _expression.get();
   }
 
-private:
+ private:
   std::unique_ptr<Expr<T, U>> _expression;
 };
 
 // ------------- LITERAL CLASS -------------
-template<typename T, typename U>
-class Literal: public Expr<T, U> {
-public:
+template <typename T, typename U>
+class Literal : public Expr<T, U> {
+ public:
   Literal(T& value, size_t size) noexcept;
   Literal(Literal&& other) noexcept;
 
-  [[gnu::always_inline]] T Accept(const typename Expr<T, U>::Visitor& visitor) const override {
+  [[gnu::always_inline]] T Accept(
+      const typename Expr<T, U>::Visitor& visitor) const override {
     return visitor.VisitLiteralExpr(*this);
   }
 
@@ -218,27 +220,24 @@ public:
     return std::make_unique<Literal<T, U>>(*_value, _size);
   }
 
-  [[gnu::always_inline]] T* GetValue() const {
-    return _value.get();
-  }
+  [[gnu::always_inline]] T* GetValue() const { return _value.get(); }
 
-  [[gnu::always_inline]] size_t GetSize() const {
-    return _size;
-  }
+  [[gnu::always_inline]] size_t GetSize() const { return _size; }
 
-private:
+ private:
   std::unique_ptr<T> _value;
   size_t _size;
 };
 
 // ------------- LOGICAL CLASS -------------
-template<typename T, typename U>
+template <typename T, typename U>
 class Logical : public Expr<T, U> {
-public:
+ public:
   Logical(Expr<T, U>& left, Token<U>& oper, Expr<T, U>& right) noexcept;
   Logical(Logical&& other) noexcept;
 
-  [[gnu::always_inline]] T Accept(const typename Expr<T, U>::Visitor& visitor) const override {
+  [[gnu::always_inline]] T Accept(
+      const typename Expr<T, U>::Visitor& visitor) const override {
     return visitor.VisitLogicalExpr(*this);
   }
 
@@ -258,20 +257,21 @@ public:
     return _right.get();
   }
 
-private:
+ private:
   std::unique_ptr<Expr<T, U>> _left;
   std::unique_ptr<Token<U>> _operator;
   std::unique_ptr<Expr<T, U>> _right;
 };
 
 // ------------- SET CLASS -------------
-template<typename T, typename U>
-class Set: public Expr<T, U> {
-public:
+template <typename T, typename U>
+class Set : public Expr<T, U> {
+ public:
   Set(Expr<T, U>& object, Token<U>& name, Expr<T, U>& value) noexcept;
   Set(Set&& other) noexcept;
 
-  [[gnu::always_inline]] T Accept(const typename Expr<T, U>::Visitor& visitor) const override {
+  [[gnu::always_inline]] T Accept(
+      const typename Expr<T, U>::Visitor& visitor) const override {
     return visitor.VisitSetExpr(*this);
   }
 
@@ -283,28 +283,27 @@ public:
     return _object.get();
   }
 
-  [[gnu::always_inline]] const Token<U>* GetName() const {
-    return _name.get();
-  }
+  [[gnu::always_inline]] const Token<U>* GetName() const { return _name.get(); }
 
   [[gnu::always_inline]] const Expr<T, U>* GetValue() const {
     return _value.get();
   }
 
-private:
+ private:
   std::unique_ptr<Expr<T, U>> _object;
   std::unique_ptr<Token<U>> _name;
   std::unique_ptr<Expr<T, U>> _value;
 };
 
 // ------------- SUPER CLASS -------------
-template<typename T, typename U>
-class Super: public Expr<T, U> {
-public:
+template <typename T, typename U>
+class Super : public Expr<T, U> {
+ public:
   Super(Token<U>& keyword, Token<U>& method) noexcept;
   Super(Super&& other) noexcept;
 
-  [[gnu::always_inline]] T Accept(const typename Expr<T, U>::Visitor& visitor) const override {
+  [[gnu::always_inline]] T Accept(
+      const typename Expr<T, U>::Visitor& visitor) const override {
     return visitor.VisitSuperExpr(*this);
   }
 
@@ -320,19 +319,20 @@ public:
     return _method.get();
   }
 
-private:
+ private:
   std::unique_ptr<Token<U>> _keyword;
   std::unique_ptr<Token<U>> _method;
 };
 
 // ------------- THIS CLASS -------------
-template<typename T, typename U>
-class This: public Expr<T, U> {
-public:
+template <typename T, typename U>
+class This : public Expr<T, U> {
+ public:
   This(Token<U>& keyword) noexcept;
   This(This&& other) noexcept;
 
-  [[gnu::always_inline]] T Accept(const typename Expr<T, U>::Visitor& visitor) const override {
+  [[gnu::always_inline]] T Accept(
+      const typename Expr<T, U>::Visitor& visitor) const override {
     return visitor.VisitThisExpr(*this);
   }
 
@@ -344,18 +344,19 @@ public:
     return _keyword.get();
   }
 
-private:
+ private:
   std::unique_ptr<Token<U>> _keyword;
 };
 
 // ------------- UNARY CLASS -------------
-template<typename T, typename U>
-class Unary: public Expr<T, U> {
-public:
+template <typename T, typename U>
+class Unary : public Expr<T, U> {
+ public:
   Unary(Token<U>& oper, Expr<T, U>& right) noexcept;
   Unary(Unary&& other) noexcept;
 
-  [[gnu::always_inline]] T Accept(const typename Expr<T, U>::Visitor& visitor) const override {
+  [[gnu::always_inline]] T Accept(
+      const typename Expr<T, U>::Visitor& visitor) const override {
     return visitor.VisitUnaryExpr(*this);
   }
 
@@ -371,19 +372,20 @@ public:
     return _right.get();
   }
 
-private:
+ private:
   std::unique_ptr<const Token<U>> _operator;
   std::unique_ptr<const Expr<T, U>> _right;
 };
 
 // ------------- VARIABLE CLASS -------------
-template<typename T, typename U>
-class Variable: public Expr<T, U> {
-public:
+template <typename T, typename U>
+class Variable : public Expr<T, U> {
+ public:
   Variable(Token<U>& name) noexcept;
   Variable(Variable&& other) noexcept;
 
-  [[gnu::always_inline]] T Accept(const typename Expr<T, U>::Visitor& visitor) const override {
+  [[gnu::always_inline]] T Accept(
+      const typename Expr<T, U>::Visitor& visitor) const override {
     return visitor.VisitVariableExpr(*this);
   }
 
@@ -391,11 +393,9 @@ public:
     return std::make_unique<Variable<T, U>>(std::move(*this));
   }
 
-  [[gnu::always_inline]] const Token<U>* GetName() const {
-    return _name.get();
-  }
+  [[gnu::always_inline]] const Token<U>* GetName() const { return _name.get(); }
 
-private:
+ private:
   std::unique_ptr<Token<U>> _name;
 };
 

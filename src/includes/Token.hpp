@@ -66,7 +66,7 @@ struct formatter<TokenType> {
   }
 
   template <typename FormatContext>
-  auto format(const TokenType &t, FormatContext &ctx) {
+  auto format(const TokenType &t, FormatContext &ctx) const {
     const char *token_names[] = {
         "(",      ")",   "{",     "}",     ",",      ".",          "-",
         "+",      ";",   "/",     "*",     "!",      "!=",         "=",
@@ -90,13 +90,10 @@ class Token {
   T literal;
   const unsigned int line = 0;
 
-  Token(const TokenType &in_token, const std::string &in_lexeme, T in_literal,
+  Token(TokenType in_token, const std::string &in_lexeme, const T &in_literal,
         unsigned int in_line)
-      : type(in_token),
-        lexeme(in_lexeme),
-        literal(std::move(in_literal)),
-        line(in_line) {}
-  Token(const TokenType &in_token, std::string &&in_lexeme, T in_literal,
+      : type(in_token), lexeme(in_lexeme), literal(in_literal), line(in_line) {}
+  Token(TokenType in_token, std::string &&in_lexeme, T &&in_literal,
         unsigned int in_line)
       : type(in_token),
         lexeme(std::move(in_lexeme)),
@@ -107,11 +104,8 @@ class Token {
         lexeme(std::move(input.lexeme)),
         literal(std::move(input.literal)),
         line(std::move(input.line)) {}
-  Token(const Token& input)
-      : type(std::move(input.type)),
-        lexeme(std::move(input.lexeme)),
-        literal(std::move(input.literal)),
-        line(std::move(input.line)) {}
+  Token(const Token &input) = delete;
+  Token &operator=(const Token &in_token) = delete;
   Token() = default;
   ~Token() = default;
 
@@ -120,7 +114,7 @@ class Token {
   static inline void ClearTokens() { tokens.clear(); }
 
   inline std::string ToString() const {
-    if constexpr (std::is_same_v<T, const void *>) {
+    if constexpr (std::is_same_v<T, std::nullptr_t>) {
       return fmt::format("{} {}", type, lexeme);
     } else {
       return fmt::format("{} {} {}", type, lexeme, *literal);
