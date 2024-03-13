@@ -1,0 +1,25 @@
+name: CI - Check Formatting
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Clang Format
+        run: sudo apt install clang-format
+
+      - name: Run Clang Format
+        run: find . \( -name '*.cpp' -o -name '*.hpp' \) -exec clang-format --style=google --dry-run --Werror -i {} +
+
+      - name: Check for Formatting Errors
+        run: |
+          git diff --quiet --exit-code
+          if [ $? -ne 0 ]; then
+            echo "Formatting errors found. Please fix them before committing."
+            exit 1
+          fi
