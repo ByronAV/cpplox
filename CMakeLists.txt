@@ -13,13 +13,14 @@ set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 set(SOURCES
-    src/Run.cpp
-    src/Token.cpp
-    src/Scanner.cpp
-    src/Expr.cpp
+    ${PROJECT_SOURCE_DIR}/src/Run.cpp
+    ${PROJECT_SOURCE_DIR}/src/Token.cpp
+    ${PROJECT_SOURCE_DIR}/src/Scanner.cpp
+    ${PROJECT_SOURCE_DIR}/src/Expr.cpp
+    ${PROJECT_SOURCE_DIR}/src/Parser.cpp
 )
 
-set(INCLUDE_DIRECTORIES src/includes)
+set(INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/src/includes)
 
 # Fetch the latest version of `fmt` and include it
 FetchContent_Declare(fmt
@@ -42,15 +43,6 @@ target_include_directories(cpplox PRIVATE ${INCLUDE_DIRECTORIES})
 target_link_libraries(cpplox PRIVATE fmt::fmt robin_hood::robin_hood)
 
 ## Testing
-FetchContent_Declare(
-  googletest
-  # Specify the commit you depend on and update it regularly.
-  URL https://github.com/google/googletest/archive/5376968f6948923e2411081fd9372e71a59d8e77.zip
-)
-FetchContent_MakeAvailable(googletest)
-
-add_executable(tests tests/unit_tests/test_token.cpp ${SOURCES} ${INCLUDE_DIRECTORIES})
-target_include_directories(tests PRIVATE ${INCLUDE_DIRECTORIES})
-target_link_libraries(tests PRIVATE fmt::fmt robin_hood::robin_hood gtest_main)
-enable_testing()
-add_test(NAME UnitTests COMMAND tests)
+if(ENABLE_TESTING)
+  add_subdirectory(tests)
+endif()
